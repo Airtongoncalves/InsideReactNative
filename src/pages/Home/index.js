@@ -1,18 +1,34 @@
-import { View,Text,StyleSheet,SafeAreaView ,TextInput,TouchableOpacity} from "react-native";
-import {Logo} from '../../components/logo';
-import { useState } from "react";
-import {Ionicons} from '@expo/vector-icons';
-export function Home (){
+import { useState, useEffect } from "react";
+import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, FlatList } from "react-native";
 
-    const [inputValue,setInputValue] = useState("");
+import { Logo } from '../../components/logo';
+import { FoodList } from "../../components/foodlist";
 
-    function handleSearch(){
+import { Ionicons } from '@expo/vector-icons';
+
+import api from '../../services/api';
+
+export function Home() {
+    const [inputValue, setInputValue] = useState("");
+    const [foods,setFoods] = useState([]);
+
+
+    useEffect(() => {
+        async function BuscaReceitas() {
+            const response = await api.get("/foods");
+            setFoods(response.data);
+        }
+        BuscaReceitas();
+    }, [])
+
+
+    function handleSearch() {
         console.log("cliquei");
         console.log(inputValue);
     }
     return (
         <SafeAreaView style={styles.container}>
-            <Logo/>
+            <Logo />
             <Text style={styles.title}>Encontre a receita</Text>
             <Text style={styles.title}>que combina com você</Text>
             <View style={styles.form}>
@@ -25,44 +41,50 @@ export function Home (){
                 <TouchableOpacity
                     onPress={handleSearch}
                 >
-                    <Ionicons name="search" size={28} color="#4cbe6c"/>
+                    <Ionicons name="search" size={28} color="#4cbe6c" />
                 </TouchableOpacity>
             </View>
+            <FlatList
+                data={foods}
+                keyExtractor={(item) => String(item.id) }
+                renderItem={ ({item}) => <FoodList data={item}/>}
+                showsVerticalScrollIndicator={false}
+            />
         </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({
-    container :{
-            flex:1,
-            backgroundColor:'#F3F9FF',
-            paddingTop:36,
-            paddingStart:14,
-            paddingEnd:14
+    container: {
+        flex: 1,
+        backgroundColor: '#F3F9FF',
+        paddingTop: 36,
+        paddingStart: 14,
+        paddingEnd: 14
     },
-    title:{
-        fontSize:26,
-        fontWeight:'bold',
-        color:"#0e0e0e"
+    title: {
+        fontSize: 26,
+        fontWeight: 'bold',
+        color: "#0e0e0e"
     },
-    input:{
-        width:'90%',
-        maxWidth:'90%',
-        height:54
+    input: {
+        width: '90%',
+        maxWidth: '90%',
+        height: 54
     },
-    form:{
- 
-        width:'100%',
+    form: {
+
+        width: '100%',
         borderRadius: 8,
-        marginTop:16,
-        marginBottom:16,
-        borderWidth:1,
-        borderColor:'#ECECEC',
-        paddingLeft:8,
-        paddingRight:8,
-        flexDirection:'row',
-        alignItems:'center',
-        justifyContent:'space-between'
+        marginTop: 16,
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: '#ECECEC',
+        paddingLeft: 8,
+        paddingRight: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
 
 
     }
